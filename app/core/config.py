@@ -21,8 +21,6 @@ class Settings(BaseSettings):
     ADMIN_PHONE: str = "0712345678"
     ADMIN_EMAIL: str = "admin@safeinvest.co.ke"
 
-    REDIS_URL: str = "redis://localhost:6379/0"
-
     TIMEZONE: str = "Africa/Nairobi"
 
     class Config:

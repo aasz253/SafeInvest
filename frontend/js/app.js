@@ -1,4 +1,6 @@
-const API_BASE = "http://127.0.0.1:8000/api/v1";
+const API_BASE = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+  ? "http://127.0.0.1:8000/api/v1"
+  : "/api/v1";
 
 function getToken() { return localStorage.getItem("token"); }
 function setToken(token) { localStorage.setItem("token", token); }
@@ -458,7 +460,7 @@ async function loadFeed() {
     data.feedbacks.forEach(f => {
       const timeAgo = getTimeAgo(f.created_at);
       const imageHtml = f.image_path
-        ? `<img src="http://127.0.0.1:8000${f.image_path}" style="width:100%;max-height:300px;object-fit:cover;border-radius:8px;margin-top:8px;" loading="lazy">`
+        ? `<img src="${f.image_path.startsWith('http') ? f.image_path : (location.hostname === 'localhost' || location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8000' : '') + f.image_path}" style="width:100%;max-height:300px;object-fit:cover;border-radius:8px;margin-top:8px;" loading="lazy">`
         : "";
 
       container.innerHTML += `

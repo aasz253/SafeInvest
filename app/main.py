@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.core.config import get_settings
 from app.core.database import engine, Base
 from app.api.v1 import auth, packages, deposits, earnings, referrals, feedback, admin, gifts, deposit_requests
@@ -37,14 +38,21 @@ uploads_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads"
 os.makedirs(uploads_dir, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
+frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
+
 
 @app.on_event("startup")
 def on_startup():
     Base.metadata.create_all(bind=engine)
+    from app.seed import run_seed
+    run_seed()
 
 
 @app.get("/")
 def root():
+    index_path = os.path.join(frontend_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
     return {
         "app": settings.APP_NAME,
         "version": "1.0.0",
