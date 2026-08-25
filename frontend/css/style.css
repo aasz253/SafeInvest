@@ -1086,6 +1086,138 @@ body::before {
   100% { text-shadow: 0 0 40px rgba(255,215,0,0.8), 0 0 80px rgba(255,215,0,0.3); transform: perspective(500px) rotateY(5deg) scale(1.05); }
 }
 
+/* Partnership Card (Kenya Govt) */
+.home-partnership-card {
+  position: relative;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-lg);
+  perspective: 800px;
+  transform-style: preserve-3d;
+  animation: cardIn 0.6s var(--smooth) both;
+  animation-delay: 0.35s;
+  overflow: hidden;
+}
+
+.home-partnership-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #000000 33%, #bb0000 33%, #bb0000 66%, #006600 66%);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.home-partnership-card:hover {
+  transform: translateY(-2px) rotateX(1deg);
+  box-shadow: var(--shadow-3d);
+}
+
+.partnership-flag {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin: 0 auto 16px;
+  width: 80px;
+  height: 54px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  position: relative;
+}
+
+.flag-stripe {
+  flex: 1;
+  height: 100%;
+}
+
+.flag-black { background: #000000; }
+.flag-red { background: #bb0000; }
+.flag-green { background: #006600; }
+
+.flag-shield {
+  position: absolute;
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.partnership-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #006600, #009900);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  text-align: center;
+  width: 100%;
+}
+
+.partnership-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.partnership-desc {
+  font-size: 13.5px;
+  color: var(--text-light);
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.partnership-desc strong {
+  color: var(--text);
+}
+
+.partnership-points {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.partnership-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.point-icon {
+  flex-shrink: 0;
+  font-size: 14px;
+  margin-top: 1px;
+}
+
+.partnership-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.partnership-seal {
+  font-size: 18px;
+}
+
 /* Invite Card (3D Chrome) */
 .home-invite-card {
   position: relative;
