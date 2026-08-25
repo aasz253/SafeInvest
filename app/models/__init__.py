@@ -8,6 +8,7 @@ from app.models.gift_code import GiftCode
 from app.models.admin_log import AdminLog
 from app.models.deposit_request import DepositRequest
 from app.models.admin_setting import AdminSetting
+from app.models.withdrawal import Withdrawal
 
 __all__ = [
     "User",
@@ -21,4 +22,5 @@ __all__ = [
     "AdminLog",
     "DepositRequest",
     "AdminSetting",
+    "Withdrawal",
 ]

@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.core.config import get_settings
 from app.core.database import engine, Base
-from app.api.v1 import auth, packages, deposits, earnings, referrals, feedback, admin, gifts, deposit_requests
+from app.api.v1 import auth, packages, deposits, earnings, referrals, feedback, admin, gifts, deposit_requests, withdrawals
 
 settings = get_settings()
 
@@ -32,6 +32,7 @@ app.include_router(feedback.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
 app.include_router(gifts.router, prefix="/api/v1")
 app.include_router(deposit_requests.router, prefix="/api/v1")
+app.include_router(withdrawals.router, prefix="/api/v1")
 
 
 uploads_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")

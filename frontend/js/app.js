@@ -74,6 +74,8 @@ function showPage(id) {
     if (nav) nav.style.display = "flex";
     if (topbar) topbar.style.display = "flex";
   }
+
+  window.scrollTo(0, 0);
 }
 
 async function loadAccount() {
@@ -137,7 +139,12 @@ async function loadAccount() {
 }
 
 function loadHome() {
-  document.getElementById("user-phone").textContent = localStorage.getItem("phone") || "";
+  if (isLoggedIn()) {
+    const phone = localStorage.getItem("phone") || "";
+    document.getElementById("user-phone").textContent = phone;
+  } else {
+    document.getElementById("user-phone").textContent = "";
+  }
   setTimeout(checkVideo, 1000);
 }
 
@@ -177,7 +184,9 @@ function tryPlayVideo() {
 function logout() {
   clearToken();
   localStorage.removeItem("phone");
-  showPage("page-login");
+  showPage("page-home");
+  document.querySelector(".bottom-nav").style.display = "flex";
+  document.querySelector(".topbar").style.display = "flex";
 }
 
 async function claimEarning() {
@@ -564,6 +573,7 @@ async function loadAdmin() {
 
     loadAdminDepositRequests();
     loadPaymentSettings();
+    loadAdminWithdrawals();
   } catch (err) {
     showToast(err.message);
   }
@@ -886,12 +896,151 @@ async function adminRejectDepositReq(requestId) {
   }
 }
 
-function init() {
+async function loadWithdrawPage() {
+  try {
+    const [balanceData, requestsData] = await Promise.all([
+      api("GET", "/withdrawals/balance"),
+      api("GET", "/withdrawals/my-requests"),
+    ]);
+
+    document.getElementById("withdraw-balance").textContent = formatMoney(balanceData.balance);
+
+    const container = document.getElementById("withdraw-reqs-list");
+    if (!container) return;
+    container.innerHTML = "";
+
+    if (requestsData.requests.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No withdrawal requests yet</p></div>';
+      return;
+    }
+
+    requestsData.requests.forEach(r => {
+      const date = new Date(r.created_at).toLocaleDateString();
+      container.innerHTML += `
+        <div class="deposit-history-item" style="flex-direction:column;align-items:flex-start;gap:6px;">
+          <div style="display:flex;justify-content:space-between;width:100%;">
+            <div style="font-weight:600;">${formatMoney(r.amount)}</div>
+            <span class="deposit-status-badge deposit-status-${r.status}">${r.status.toUpperCase()}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-light);">📱 ${r.phone}</div>
+          ${r.status === 'rejected' && r.reason ? `<div style="font-size:12px;color:var(--danger);">Reason: ${escapeHtml(r.reason)}</div>` : ''}
+          <div style="font-size:11px;color:var(--text-light);">${date}</div>
+        </div>`;
+    });
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+async function submitWithdrawal() {
+  const amount = parseFloat(document.getElementById("withdraw-amount").value);
+  const phone = document.getElementById("withdraw-phone").value.trim();
+
+  hideMsg("withdraw-error");
+  hideMsg("withdraw-success");
+
+  if (!amount || amount <= 0) return showMsg("withdraw-error", "Enter a valid amount");
+  if (!phone || phone.length < 10) return showMsg("withdraw-error", "Enter a valid phone number");
+
+  try {
+    const result = await api("POST", "/withdrawals/create", { amount, phone });
+    showMsg("withdraw-success", result.message);
+    document.getElementById("withdraw-amount").value = "";
+    loadWithdrawPage();
+  } catch (err) {
+    showMsg("withdraw-error", err.message);
+  }
+}
+
+async function loadAdminWithdrawals() {
+  try {
+    const data = await api("GET", "/withdrawals/admin/list");
+    const container = document.getElementById("admin-withdrawals-list");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const pending = data.requests.filter(r => r.status === "pending");
+    const processed = data.requests.filter(r => r.status !== "pending");
+
+    if (data.requests.length === 0) {
+      container.innerHTML = '<div class="empty-state"><p>No withdrawal requests</p></div>';
+      return;
+    }
+
+    if (pending.length > 0) {
+      pending.forEach(r => {
+        const date = new Date(r.created_at).toLocaleDateString();
+        container.innerHTML += `
+          <div class="card" style="margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+              <strong>${r.user_phone}</strong>
+              <span style="font-weight:700;color:var(--primary);">${formatMoney(r.amount)}</span>
+            </div>
+            <div style="font-size:13px;color:var(--text-light);margin-bottom:8px;">
+              Send to: <strong>${r.phone}</strong><br>Date: ${date}
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-success" style="flex:1;padding:10px;" onclick="adminApproveWithdrawal('${r.id}')">Approve</button>
+              <button class="btn btn-danger" style="flex:1;padding:10px;" onclick="adminRejectWithdrawal('${r.id}')">Reject</button>
+            </div>
+          </div>`;
+      });
+    }
+
+    if (processed.length > 0) {
+      container.innerHTML += '<div style="font-size:13px;color:var(--text-light);margin:12px 0 8px;font-weight:600;">Processed</div>';
+      processed.slice(0, 10).forEach(r => {
+        const date = new Date(r.created_at).toLocaleDateString();
+        container.innerHTML += `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-weight:600;font-size:13px;">${r.user_phone} → ${r.phone}</div>
+              <div style="font-size:11px;color:var(--text-light);">${formatMoney(r.amount)} · ${date}</div>
+            </div>
+            <span class="deposit-status-badge deposit-status-${r.status}">${r.status.toUpperCase()}</span>
+          </div>`;
+      });
+    }
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+async function adminApproveWithdrawal(requestId) {
+  try {
+    await api("PUT", `/withdrawals/admin/approve/${requestId}`);
+    showToast("Withdrawal approved!");
+    loadAdminWithdrawals();
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+async function adminRejectWithdrawal(requestId) {
+  try {
+    await api("PUT", `/withdrawals/admin/reject/${requestId}`, { reason: "Rejected by admin" });
+    showToast("Withdrawal rejected");
+    loadAdminWithdrawals();
+  } catch (err) {
+    showToast(err.message);
+  }
+}
+
+function requireAuth(action) {
   if (!isLoggedIn()) {
+    showToast("Please login or register to continue");
     showPage("page-login");
-  } else {
+    return false;
+  }
+  return true;
+}
+
+function init() {
+  showPage("page-home");
+  document.querySelector(".bottom-nav").style.display = "flex";
+  document.querySelector(".topbar").style.display = "flex";
+  if (isLoggedIn()) {
     loadHome();
-    showPage("page-home");
   }
 }
 
