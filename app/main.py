@@ -44,20 +44,15 @@ except Exception:
 
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 
-_db_seeded = False
-
 
 @app.on_event("startup")
 def on_startup():
-    global _db_seeded
     try:
         Base.metadata.create_all(bind=engine)
-        if not _db_seeded:
-            from app.seed import run_seed
-            run_seed()
-            _db_seeded = True
+        from app.seed import run_seed
+        run_seed()
     except Exception as e:
-        print(f"Startup seed error: {e}")
+        print(f"Startup error (non-fatal): {e}")
 
 
 @app.get("/")

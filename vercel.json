@@ -5,12 +5,9 @@
       "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
-        "maxDuration": 30
+        "maxDuration": 30,
+        "includeFiles": ["app/**", "frontend/**", "uploads/**"]
       }
-    },
-    {
-      "src": "frontend/**",
-      "use": "@vercel/static"
     }
   ],
   "routes": [

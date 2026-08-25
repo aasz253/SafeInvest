@@ -391,6 +391,66 @@ body::before {
   transform: scale(1.02);
 }
 
+/* ==================== AUTH PARTNERSHIP (Login Page) ==================== */
+.auth-partnership {
+  margin: 0 20px 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fffe 0%, #f0faf5 100%);
+  border-radius: var(--radius);
+  border: 1px solid rgba(0,102,0,0.1);
+  text-align: center;
+}
+
+.auth-partner-flag {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin: 0 auto 12px;
+  width: 60px;
+  height: 40px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.auth-flag-stripe {
+  flex: 1;
+  height: 100%;
+}
+
+.auth-partner-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #006600, #009900);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 8px;
+}
+
+.auth-partner-text {
+  font-size: 12px;
+  color: var(--text-light);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.auth-partner-text strong {
+  color: var(--text);
+}
+
+.auth-partner-points {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+
 /* ==================== PROGRESS ==================== */
 .progress-bar-container {
   background: rgba(0,0,0,0.04);
