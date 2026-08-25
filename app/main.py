@@ -34,7 +34,6 @@ app.include_router(gifts.router, prefix="/api/v1")
 app.include_router(deposit_requests.router, prefix="/api/v1")
 app.include_router(withdrawals.router, prefix="/api/v1")
 
-
 uploads_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
 try:
     os.makedirs(uploads_dir, exist_ok=True)
@@ -45,6 +44,19 @@ except Exception:
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public")
 if not os.path.exists(frontend_dir):
     frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
+
+try:
+    css_dir = os.path.join(frontend_dir, "css")
+    js_dir = os.path.join(frontend_dir, "js")
+    images_dir = os.path.join(frontend_dir, "images")
+    if os.path.exists(css_dir):
+        app.mount("/css", StaticFiles(directory=css_dir), name="css")
+    if os.path.exists(js_dir):
+        app.mount("/js", StaticFiles(directory=js_dir), name="js")
+    if os.path.exists(images_dir):
+        app.mount("/images", StaticFiles(directory=images_dir), name="images")
+except Exception:
+    pass
 
 
 @app.on_event("startup")
@@ -57,19 +69,25 @@ def on_startup():
         print(f"Startup error (non-fatal): {e}")
 
 
-@app.get("/")
-def root():
-    index_path = os.path.join(frontend_dir, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {
-        "app": settings.APP_NAME,
-        "version": "1.0.0",
-        "docs": "/docs",
-        "status": "running",
-    }
+@app.get("/favicon.ico")
+def favicon():
+    return {"status": "no favicon"}
 
 
 @app.get("/health")
 def health():
     return {"status": "healthy"}
+
+
+@app.api_route("/{full_path:path}", methods=["GET"])
+def serve_frontend(full_path: str):
+    if full_path.startswith("api/"):
+        return None
+    if full_path.startswith("docs") or full_path.startswith("openapi"):
+        return None
+    if full_path.startswith("uploads/"):
+        return None
+    index_path = os.path.join(frontend_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"app": settings.APP_NAME, "version": "1.0.0", "status": "running"}
