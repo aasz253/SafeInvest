@@ -36,17 +36,28 @@ app.include_router(withdrawals.router, prefix="/api/v1")
 
 
 uploads_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
-os.makedirs(uploads_dir, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+try:
+    os.makedirs(uploads_dir, exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+except Exception:
+    pass
 
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
+
+_db_seeded = False
 
 
 @app.on_event("startup")
 def on_startup():
-    Base.metadata.create_all(bind=engine)
-    from app.seed import run_seed
-    run_seed()
+    global _db_seeded
+    try:
+        Base.metadata.create_all(bind=engine)
+        if not _db_seeded:
+            from app.seed import run_seed
+            run_seed()
+            _db_seeded = True
+    except Exception as e:
+        print(f"Startup seed error: {e}")
 
 
 @app.get("/")
