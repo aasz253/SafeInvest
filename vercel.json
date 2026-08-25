@@ -5,8 +5,7 @@
       "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
-        "maxDuration": 30,
-        "includeFiles": ["app/**", "frontend/**", "uploads/**"]
+        "maxDuration": 30
       }
     }
   ],
@@ -32,8 +31,12 @@
       "dest": "/api/index.py"
     },
     {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|mp4|webm|woff|woff2|ttf|eot))",
+      "dest": "/public/$1"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "dest": "/public/index.html"
     }
   ]
 }

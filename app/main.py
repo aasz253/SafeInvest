@@ -42,7 +42,9 @@ try:
 except Exception:
     pass
 
-frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
+frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "public")
+if not os.path.exists(frontend_dir):
+    frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 
 
 @app.on_event("startup")
