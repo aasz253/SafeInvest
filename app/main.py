@@ -1,8 +1,8 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from app.core.config import get_settings
 from app.core.database import engine, Base
 from app.api.v1 import auth, packages, deposits, earnings, referrals, feedback, admin, gifts, deposit_requests, withdrawals
@@ -69,25 +69,21 @@ def on_startup():
         print(f"Startup error (non-fatal): {e}")
 
 
+@app.middleware("http")
+async def serve_spa(request: Request, call_next):
+    response = await call_next(request)
+    if response.status_code == 404 and not request.url.path.startswith("/api") and not request.url.path.startswith("/docs") and not request.url.path.startswith("/openapi") and not request.url.path.startswith("/uploads") and not request.url.path.startswith("/css") and not request.url.path.startswith("/js") and not request.url.path.startswith("/images"):
+        index_path = os.path.join(frontend_dir, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+    return response
+
+
 @app.get("/favicon.ico")
 def favicon():
-    return {"status": "no favicon"}
+    return JSONResponse(status_code=204, content=None)
 
 
 @app.get("/health")
 def health():
     return {"status": "healthy"}
-
-
-@app.api_route("/{full_path:path}", methods=["GET"])
-def serve_frontend(full_path: str):
-    if full_path.startswith("api/"):
-        return None
-    if full_path.startswith("docs") or full_path.startswith("openapi"):
-        return None
-    if full_path.startswith("uploads/"):
-        return None
-    index_path = os.path.join(frontend_dir, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
-    return {"app": settings.APP_NAME, "version": "1.0.0", "status": "running"}
