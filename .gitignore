@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+safeinvest.db
+uploads/
+.env
+*.log
+.DS_Store
+node_modules/

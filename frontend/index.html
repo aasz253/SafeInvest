@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SafeInvest</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<!-- ==================== TOPBAR ==================== -->
+<div class="topbar">
+  <span>SafeInvest</span>
+  <span id="user-phone" style="font-size:13px;opacity:0.9;"></span>
+</div>
+
+<!-- ==================== LOGIN PAGE ==================== -->
+<div id="page-login" class="page page-auth active">
+  <div class="auth-logo">
+    <h1>🔒 SafeInvest</h1>
+    <p>Your money is safe. Your future is bright.</p>
+  </div>
+  <div class="auth-form">
+    <div class="tab-switch">
+      <button class="active" onclick="toggleAuthTab('login')">Login</button>
+      <button onclick="toggleAuthTab('register')">Register</button>
+    </div>
+
+    <div id="login-form">
+      <div id="login-error" class="error-msg"></div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="login-phone" placeholder="0712345678" maxlength="10">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Enter password">
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Login</button>
+    </div>
+
+    <div id="register-form" style="display:none;">
+      <div id="register-error" class="error-msg"></div>
+      <div id="register-success" class="success-msg"></div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="reg-phone" placeholder="0712345678" maxlength="10">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="Min 8 characters">
+      </div>
+      <div class="form-group">
+        <label>Referral Code (Optional)</label>
+        <input type="text" id="reg-referral" placeholder="Enter referral code">
+      </div>
+      <button class="btn btn-primary" onclick="doRegister()">Register</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== OTP PAGE ==================== -->
+<div id="page-otp" class="page page-auth">
+  <div class="auth-logo">
+    <h1>🔒 SafeInvest</h1>
+    <p>Enter the 6-digit OTP sent to your phone</p>
+  </div>
+  <div class="auth-form">
+    <div id="otp-error" class="error-msg"></div>
+    <div id="otp-success" class="success-msg"></div>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="otp-phone" placeholder="0712345678" maxlength="10">
+    </div>
+    <div class="form-group">
+      <label>OTP Code</label>
+      <input type="text" id="otp-code" placeholder="123456" maxlength="6">
+    </div>
+    <button class="btn btn-primary" onclick="doVerifyOTP()">Verify</button>
+    <button class="btn btn-outline" style="margin-top:12px;" onclick="doResendOTP()">📱 Get OTP</button>
+    <p id="otp-hint" style="font-size:12px;color:var(--text-light);text-align:center;margin-top:8px;display:none;">
+      OTP will appear below (mock mode - no SMS needed)
+    </p>
+    <div id="otp-display" style="display:none;background:#e8f0fe;border-radius:8px;padding:16px;margin-top:12px;text-align:center;">
+      <div style="font-size:12px;color:var(--text-light);">Your OTP Code</div>
+      <div id="otp-display-code" style="font-size:32px;font-weight:800;color:var(--primary);letter-spacing:8px;margin-top:4px;"></div>
+    </div>
+    <button class="btn btn-outline" style="margin-top:12px;" onclick="toggleAuthTab('login')">Back to Login</button>
+  </div>
+</div>
+
+<!-- ==================== HOME (ATTRACTIVE LANDING) ==================== -->
+<div id="page-home" class="page">
+  <div class="home-hero">
+    <div class="home-hero-bg"></div>
+    <div class="home-hero-content">
+      <div class="hero-logo">🔒</div>
+      <h1 class="hero-title">SafeInvest</h1>
+      <p class="hero-subtitle">Grow your money daily. It's safe. It's simple.</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="home-announcement">
+      <div class="announcement-icon">🎉</div>
+      <div>
+        <div class="announcement-title">Earn Daily Returns</div>
+        <div class="announcement-text">Invest once, earn every day for up to 30 days. Start with as little as KSH 450.</div>
+      </div>
+    </div>
+
+    <div class="home-video-section">
+      <div class="video-header">
+        <span>▶</span>
+        <span>How SafeInvest Works</span>
+      </div>
+      <div class="video-wrapper">
+        <video id="home-promo-video" muted loop playsinline onerror="showVideoFallback()" onloadeddata="hideVideoFallback()">
+          <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4" type="video/mp4">
+        </video>
+        <div class="video-overlay" id="video-play-overlay" onclick="tryPlayVideo()">
+          <div class="video-play-btn">▶</div>
+          <div class="video-label">Watch How It Works</div>
+        </div>
+        <div class="video-fallback" id="video-fallback">
+          <div class="fallback-scroll-container">
+            <div class="fallback-scroll-text">
+              <span class="fallback-word">🎬 Video Coming Soon</span>
+              <span class="fallback-word">💰 Increase Your Earnings</span>
+              <span class="fallback-word">🚀 New Investors Welcome</span>
+              <span class="fallback-word">📈 Grow Daily Returns</span>
+              <span class="fallback-word">🔒 Safe & Secure</span>
+              <span class="fallback-word">👥 Join Thousands</span>
+              <span class="fallback-word">🎬 Video Coming Soon</span>
+              <span class="fallback-word">💰 Increase Your Earnings</span>
+              <span class="fallback-word">🚀 New Investors Welcome</span>
+              <span class="fallback-word">📈 Grow Daily Returns</span>
+              <span class="fallback-word">🔒 Safe & Secure</span>
+              <span class="fallback-word">👥 Join Thousands</span>
+            </div>
+          </div>
+          <div class="fallback-sub">Video Coming Soon for New Investors — Increase Your Earning!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-invite-card">
+      <div class="invite-glow"></div>
+      <div class="invite-icon">👥</div>
+      <div class="invite-title">Invite Friends & Earn More</div>
+      <div class="invite-desc">Share your referral code. When they invest, you both earn bonuses!</div>
+      <div class="invite-bonus-row">
+        <div class="invite-bonus-item">
+          <div class="invite-bonus-amount">KSH 150</div>
+          <div class="invite-bonus-label">Per Referral</div>
+        </div>
+        <div class="invite-bonus-divider"></div>
+        <div class="invite-bonus-item">
+          <div class="invite-bonus-amount">KSH 100+</div>
+          <div class="invite-bonus-label">Increasing Bonus</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="showPage('page-team');loadTeam();" style="margin-top:12px;">Invite Now</button>
+    </div>
+
+    <div class="home-features">
+      <div class="home-feature">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">Secure</div>
+        <div class="feature-text">Your money is safe with us</div>
+      </div>
+      <div class="home-feature">
+        <div class="feature-icon">💰</div>
+        <div class="feature-title">Daily Earnings</div>
+        <div class="feature-text">Claim returns every day</div>
+      </div>
+      <div class="home-feature">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">Fast Payouts</div>
+        <div class="feature-text">Withdraw anytime</div>
+      </div>
+    </div>
+
+    <div class="home-quick-links">
+      <div class="quick-link" onclick="showPage('page-deposit');loadDepositPage();">
+        <div class="quick-link-icon">💸</div>
+        <div class="quick-link-label">Deposit</div>
+      </div>
+      <div class="quick-link" onclick="showPage('page-packages');loadPackages();">
+        <div class="quick-link-icon">💰</div>
+        <div class="quick-link-label">Invest Now</div>
+      </div>
+      <div class="quick-link" onclick="showPage('page-gifts');loadGifts();">
+        <div class="quick-link-icon">🎁</div>
+        <div class="quick-link-label">Gift Code</div>
+      </div>
+      <div class="quick-link" onclick="showPage('page-feedback');loadFeed();">
+        <div class="quick-link-icon">💬</div>
+        <div class="quick-link-label">Community</div>
+      </div>
+    </div>
+
+    <div class="home-steps">
+      <div class="steps-title">How to Get Started</div>
+      <div class="step-item">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <div class="step-name">Create Account</div>
+          <div class="step-desc">Register with your phone number</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <div class="step-name">Choose a Plan</div>
+          <div class="step-desc">Pick an investment package that suits you</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <div class="step-name">Pay via M-PESA</div>
+          <div class="step-desc">Admin confirms your deposit</div>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <div class="step-name">Earn Daily</div>
+          <div class="step-desc">Claim your earnings every day!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MY ACCOUNT (OLD DASHBOARD) ==================== -->
+<div id="page-account" class="page">
+  <div class="container">
+    <div class="card earning-big">
+      <div class="label">Today's Earning</div>
+      <div class="amount" id="today-earning">KSH 0</div>
+      <button id="claim-btn" class="btn-claim" onclick="claimEarning()" style="margin-top:16px;">Claim Now</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">📊 Active Packages</div>
+      <div id="active-packages">
+        <div class="empty-state"><div class="icon">📦</div><p>Loading...</p></div>
+      </div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-value" id="total-earnings">KSH 0</div>
+        <div class="stat-label">Total Earned</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="referral-count">0</div>
+        <div class="stat-label">Team Members</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="referral-bonus-dash">KSH 0</div>
+        <div class="stat-label">Referral Bonus</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" style="color:var(--secondary);">🔒</div>
+        <div class="stat-label">Safe & Secure</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="card-header">⚙️ Settings</div>
+      <div onclick="showPage('page-gifts');loadGifts();" style="padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;font-weight:600;">🎁 Gifts</div>
+      <div onclick="showPage('page-deposits');loadDeposits();" style="padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;font-weight:600;">💳 Deposit History</div>
+      <div onclick="showPage('page-feedback');loadFeed();" style="padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;font-weight:600;">💬 Community</div>
+      <div id="admin-menu-link" onclick="showPage('page-admin');loadAdmin();" style="padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;font-weight:600;display:none;">🛡️ Admin Panel</div>
+      <div onclick="logout()" style="padding:14px 0;cursor:pointer;font-weight:600;color:var(--danger);">🚪 Logout</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PACKAGES ==================== -->
+<div id="page-packages" class="page">
+  <div class="container">
+    <div class="card">
+      <div class="card-header">💰 Investment Plans</div>
+      <p style="font-size:13px;color:var(--text-light);margin-bottom:12px;">Select a plan to start earning daily</p>
+      <div id="packages-list">
+        <div class="empty-state"><p>Loading plans...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== EARNINGS ==================== -->
+<div id="page-earnings" class="page">
+  <div class="container">
+    <div class="stat-grid" style="margin-bottom:12px;">
+      <div class="stat-box">
+        <div class="stat-value" id="earned-total">KSH 0</div>
+        <div class="stat-label">Total Earned</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="earned-pending">KSH 0</div>
+        <div class="stat-label">Pending</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">💰 Earning History</div>
+      <div id="earnings-list">
+        <div class="empty-state"><p>Loading...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MY TEAM ==================== -->
+<div id="page-team" class="page">
+  <div class="container">
+    <div class="card">
+      <div class="card-header">👥 My Team (<span id="team-count">0</span>)</div>
+      <p style="font-size:13px;color:var(--text-light);margin-bottom:12px;">Share your referral code and earn bonuses</p>
+      <div style="background:var(--bg);padding:12px;border-radius:8px;margin-bottom:12px;">
+        <div style="font-size:12px;color:var(--text-light);">Your Referral Code</div>
+        <div style="font-size:20px;font-weight:700;color:var(--primary);" id="referral-code">---</div>
+      </div>
+      <div class="form-group">
+        <label>Share Link</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="referral-link" readonly style="flex:1;font-size:12px;">
+          <button class="btn btn-primary" style="width:auto;padding:12px 16px;" onclick="copyReferral()">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">👥 Team Members</div>
+      <div id="team-list">
+        <div class="empty-state"><p>Loading...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DEPOSITS HISTORY ==================== -->
+<div id="page-deposits" class="page">
+  <div class="topbar">
+    <button class="back-btn" onclick="showPage('page-account')">←</button>
+    <span>Deposit History</span>
+    <span></span>
+  </div>
+  <div class="container">
+    <div class="card">
+      <div id="deposits-list"><div class="empty-state"><p>Loading...</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FEEDBACK / COMMUNITY FEED ==================== -->
+<div id="page-feedback" class="page">
+  <div class="topbar">
+    <button class="back-btn" onclick="showPage('page-account')">←</button>
+    <span>Community</span>
+    <span></span>
+  </div>
+  <div class="container">
+    <div class="card" style="margin-bottom:16px;">
+      <div class="form-group" style="margin-bottom:8px;">
+        <textarea id="feedback-msg" rows="3" placeholder="Share your experience..."></textarea>
+      </div>
+      <div id="feedback-preview" style="display:none;margin-bottom:8px;position:relative;">
+        <img id="feedback-preview-img" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;">
+        <button onclick="clearFeedbackImage()" style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;">✕</button>
+      </div>
+      <input type="file" id="feedback-image" accept="image/*" style="display:none;" onchange="previewFeedbackImage(event)">
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button onclick="document.getElementById('feedback-image').click()" style="background:none;border:none;font-size:24px;cursor:pointer;" title="Add photo">📷</button>
+        <button class="btn btn-primary" style="flex:1;" onclick="submitFeedback()">Post</button>
+      </div>
+    </div>
+
+    <div id="feed-list">
+      <div class="empty-state"><p>Loading posts...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADMIN PANEL ==================== -->
+<div id="page-admin" class="page">
+  <div class="topbar">
+    <button class="back-btn" onclick="showPage('page-account')">←</button>
+    <span>Admin Panel</span>
+    <span></span>
+  </div>
+  <div class="container">
+    <div class="stat-grid" style="margin-bottom:12px;">
+      <div class="stat-box">
+        <div class="stat-value" id="admin-total-users">0</div>
+        <div class="stat-label">Users</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="admin-pending">0</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="admin-total-deposits">0</div>
+        <div class="stat-label">Approved</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="admin-total-earnings">0</div>
+        <div class="stat-label">Claims</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">⏳ Pending Deposits</div>
+      <div id="admin-pending-list"><div class="empty-state"><p>Loading...</p></div></div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="card-header">📱 M-PESA Payment Number</div>
+      <p style="font-size:13px;color:var(--text-light);margin-bottom:12px;">This is the number users see when depositing money.</p>
+      <div class="form-group">
+        <label>Payment Number</label>
+        <input type="tel" id="admin-payment-number" placeholder="0712345678" maxlength="15">
+      </div>
+      <div class="form-group">
+        <label>Account Name</label>
+        <input type="text" id="admin-payment-name" placeholder="SafeInvest M-PESA">
+      </div>
+      <div id="admin-payment-msg" class="success-msg"></div>
+      <button class="btn btn-primary" onclick="adminUpdatePayment()">Save Payment Number</button>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="card-header">💸 M-PESA Deposit Requests</div>
+      <div id="admin-deposit-reqs-list"><div class="empty-state"><p>Loading...</p></div></div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="card-header">🎁 Create Gift Codes</div>
+      <div class="form-group">
+        <label>Amount (KSH)</label>
+        <input type="number" id="admin-gift-amount" placeholder="e.g. 500" min="1">
+      </div>
+      <div class="form-group">
+        <label>Description (optional)</label>
+        <input type="text" id="admin-gift-desc" placeholder="e.g. Welcome bonus">
+      </div>
+      <div class="form-group">
+        <label>How many codes?</label>
+        <input type="number" id="admin-gift-qty" placeholder="1" min="1" max="50" value="1">
+      </div>
+      <button class="btn btn-success" onclick="adminCreateGifts()">Generate Codes</button>
+      <div id="admin-gift-result" style="display:none;margin-top:12px;background:#e6f4ea;padding:12px;border-radius:8px;">
+        <div style="font-size:12px;color:var(--text-light);margin-bottom:4px;">Generated codes (share via WhatsApp):</div>
+        <div id="admin-gift-codes" style="font-family:monospace;font-size:13px;word-break:break-all;"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="card-header">📋 All Gift Codes</div>
+      <div id="admin-gifts-list"><div class="empty-state"><p>Loading...</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== GIFTS PAGE ==================== -->
+<div id="page-gifts" class="page">
+  <div class="topbar">
+    <button class="back-btn" onclick="showPage('page-account')">←</button>
+    <span>Gifts</span>
+    <span></span>
+  </div>
+  <div class="container">
+    <div class="card" style="margin-bottom:12px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:8px;">🎁</div>
+      <div style="font-size:16px;font-weight:600;margin-bottom:4px;">Redeem Gift Code</div>
+      <div style="font-size:13px;color:var(--text-light);margin-bottom:16px;">Enter the code sent to you via WhatsApp</div>
+      <div class="form-group">
+        <input type="text" id="gift-code-input" placeholder="e.g. A1B2C3D4E5" maxlength="10" style="text-align:center;font-size:18px;letter-spacing:4px;text-transform:uppercase;font-weight:700;">
+      </div>
+      <button class="btn btn-success" onclick="redeemGift()">🎁 Receive Gift</button>
+      <div id="gift-error" class="error-msg"></div>
+      <div id="gift-success" class="success-msg"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">📋 My Received Gifts</div>
+      <div id="my-gifts-list"><p style="text-align:center;color:var(--text-light);">Loading...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DEPOSIT PAGE ==================== -->
+<div id="page-deposit" class="page">
+  <div class="topbar">
+    <button class="back-btn" onclick="showPage('page-home')">←</button>
+    <span>Deposit Funds</span>
+    <span></span>
+  </div>
+  <div class="container">
+    <div class="deposit-payment-card">
+      <div class="deposit-payment-icon">📱</div>
+      <div class="deposit-payment-label">Send money to this M-PESA Number</div>
+      <div class="deposit-payment-number" id="deposit-payment-number">---</div>
+      <div class="deposit-payment-name" id="deposit-payment-name">---</div>
+      <div class="deposit-payment-notice">Use Lipa Na M-PESA (Send Money)</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">💰 Submit Deposit</div>
+      <p style="font-size:13px;color:var(--text-light);margin-bottom:12px;">After sending money, enter the amount and paste the M-PESA confirmation message below.</p>
+      <div class="form-group">
+        <label>Amount You Sent (KSH)</label>
+        <input type="number" id="deposit-req-amount" placeholder="e.g. 500" min="1">
+      </div>
+      <div class="form-group">
+        <label>M-PESA Confirmation Message</label>
+        <textarea id="deposit-req-message" rows="4" placeholder="Paste the full M-PESA message here. Example: SJK3R4ZT9 confirmed. KSH500 sent to..."></textarea>
+      </div>
+      <div id="deposit-req-error" class="error-msg"></div>
+      <div id="deposit-req-success" class="success-msg"></div>
+      <button class="btn btn-success" onclick="submitDepositRequest()">📤 Submit Deposit Request</button>
+    </div>
+
+    <div class="card">
+      <div class="card-header">📋 My Deposit Requests</div>
+      <div id="my-deposit-reqs-list"><p style="text-align:center;color:var(--text-light);">Loading...</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== INVEST MODAL ==================== -->
+<div id="invest-modal" class="modal-overlay" onclick="closeModal('invest-modal')">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <div class="modal-title">Confirm Investment</div>
+    <p style="color:var(--text-light);margin-bottom:16px;">You are about to invest in a package. After payment confirmation, admin will approve your deposit and earnings will start the next day.</p>
+    <div style="background:var(--bg);padding:16px;border-radius:8px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:13px;color:var(--text-light);">Package Amount</div>
+      <div style="font-size:28px;font-weight:700;color:var(--primary);" id="modal-amount">KSH 0</div>
+    </div>
+    <div class="form-group">
+      <label>Your Deposit Amount (KSH)</label>
+      <input type="number" id="deposit-amount-input" min="1" placeholder="Enter deposit amount" oninput="validateDepositAmount()">
+    </div>
+    <div id="deposit-error" class="error-msg"></div>
+    <p style="font-size:12px;color:var(--text-light);margin-bottom:16px;">Payment will be processed manually. Admin will approve after you pay via M-PESA or bank transfer.</p>
+    <button id="confirm-invest-btn" class="btn btn-primary" onclick="confirmInvest()">Confirm & Invest</button>
+    <button class="btn btn-outline" style="margin-top:8px;" onclick="closeModal('invest-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- ==================== BOTTOM NAV ==================== -->
+<div class="bottom-nav" style="display:none;">
+  <button class="nav-item active" id="nav-home" onclick="showPage('page-home');">
+    <span class="nav-icon">🏠</span>Home
+  </button>
+  <button class="nav-item" id="nav-invest" onclick="showPage('page-packages');loadPackages();">
+    <span class="nav-icon">💰</span>Invest
+  </button>
+  <button class="nav-item" id="nav-earnings" onclick="showPage('page-earnings');loadEarnings();">
+    <span class="nav-icon">📈</span>Earnings
+  </button>
+  <button class="nav-item" id="nav-team" onclick="showPage('page-team');loadTeam();">
+    <span class="nav-icon">👥</span>Team
+  </button>
+  <button class="nav-item" id="nav-account" onclick="showPage('page-account');loadAccount();">
+    <span class="nav-icon">👤</span>Account
+  </button>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+function toggleAuthTab(tab) {
+  const loginForm = document.getElementById("login-form");
+  const registerForm = document.getElementById("register-form");
+  const tabs = document.querySelectorAll(".tab-switch button");
+
+  if (tab === "login") {
+    loginForm.style.display = "block";
+    registerForm.style.display = "none";
+    tabs[0].classList.add("active");
+    tabs[1].classList.remove("active");
+    showPage("page-login");
+  } else {
+    loginForm.style.display = "none";
+    registerForm.style.display = "block";
+    tabs[0].classList.remove("active");
+    tabs[1].classList.add("active");
+    showPage("page-login");
+  }
+}
+
+async function doLogin() {
+  const phone = document.getElementById("login-phone").value.trim();
+  const password = document.getElementById("login-password").value;
+
+  hideMsg("login-error");
+  if (!phone || !password) return showMsg("login-error", "Fill all fields");
+
+  try {
+    const result = await api("POST", "/auth/login", { phone, password });
+
+    if (result.requires_verification) {
+      document.getElementById("otp-phone").value = phone;
+      showPage("page-otp");
+      return;
+    }
+
+    setToken(result.token);
+    localStorage.setItem("phone", phone);
+    loadHome();
+    showPage("page-home");
+  } catch (err) {
+    showMsg("login-error", err.message);
+  }
+}
+
+async function doRegister() {
+  const phone = document.getElementById("reg-phone").value.trim();
+  const password = document.getElementById("reg-password").value;
+  const referral = document.getElementById("reg-referral").value.trim();
+
+  hideMsg("register-error");
+  hideMsg("register-success");
+  if (!phone || !password) return showMsg("register-error", "Fill all fields");
+  if (password.length < 8) return showMsg("register-error", "Password must be 8+ characters");
+
+  try {
+    const result = await api("POST", "/auth/register", {
+      phone,
+      password,
+      referral_code: referral || undefined,
+    });
+
+    setToken(result.token);
+    document.getElementById("otp-phone").value = phone;
+    showMsg("register-success", result.message);
+    setTimeout(() => showPage("page-otp"), 1000);
+  } catch (err) {
+    showMsg("register-error", err.message);
+  }
+}
+
+async function doVerifyOTP() {
+  const phone = document.getElementById("otp-phone").value.trim();
+  const otp = document.getElementById("otp-code").value.trim();
+
+  hideMsg("otp-error");
+  hideMsg("otp-success");
+  if (!phone || !otp) return showMsg("otp-error", "Fill all fields");
+  if (otp.length !== 6) return showMsg("otp-error", "OTP must be 6 digits");
+
+  try {
+    const result = await api("POST", "/auth/verify-otp", { phone, otp });
+    showMsg("otp-success", result.message);
+    setTimeout(() => {
+      showPage("page-home");
+    }, 1000);
+  } catch (err) {
+    showMsg("otp-error", err.message);
+  }
+}
+
+document.getElementById("invest-modal").addEventListener("click", function(e) {
+  if (e.target === this) closeModal("invest-modal");
+});
+</script>
+</body>
+</html>
